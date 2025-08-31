@@ -1,0 +1,6 @@
+.vscode/
+.claude/
+.serena/
+
+/dist
+/node_modules
