@@ -8,6 +8,7 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
+import { pathToFileURL } from 'url';
 
 import { JiuyangongsheApiClient } from './services/jiuyangongshe-api.js';
 import { ArticleRankingTool } from './tools/article-ranking.js';
@@ -132,7 +133,7 @@ async function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
     console.error('启动错误:', error);
     process.exit(1);
