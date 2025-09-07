@@ -1,11 +1,7 @@
 import { z } from 'zod';
 
-// 文章排行榜相关类型
-export const ArticleRankingRequestSchema = z.object({
-  timeRange: z.enum(['day', 'week', 'month']).optional().default('day'),
-  category: z.enum(['all', 'stock', 'industry', 'news', 'memo']).optional().default('all'),
-  limit: z.number().min(1).max(100).optional().default(20)
-});
+// 文章排行榜相关类型 - rank-board接口不支持任何参数
+export const ArticleRankingRequestSchema = z.object({});
 
 export const ArticleRankingItemSchema = z.object({
   id: z.string(),
@@ -31,11 +27,8 @@ export const ArticleRankingResponseSchema = z.object({
   })
 });;
 
-// 时间轴事件相关类型
+// 时间轴事件相关类型 - news接口仅支持limit参数
 export const TimelineEventsRequestSchema = z.object({
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  eventType: z.enum(['all', 'earnings', 'policy', 'merger', 'investment']).optional().default('all'),
   limit: z.number().min(1).max(100).optional().default(20)
 });
 

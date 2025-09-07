@@ -14,6 +14,13 @@ import { JiuyangongsheApiClient } from './services/jiuyangongshe-api.js';
 import { ArticleRankingTool } from './tools/article-ranking.js';
 import { TimelineEventsTool } from './tools/timeline-events.js';
 
+/**
+ * 韭菜股票MCP服务器
+ * 
+ * 提供基于Model Context Protocol的韭研公社股票数据服务，包含：
+ * - get_article_ranking: 文章热度排行榜（无参数）
+ * - get_timeline_events: 财经事件时间轴（仅支持limit参数）
+ */
 class JiucaiStockMcpServer {
   private server: Server;
   private apiClient: JiuyangongsheApiClient;
@@ -140,4 +147,4 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   });
 }
 
-export { JiucaiStockMcpServer };
+export { JiucaiStockMcpServer, JiuyangongsheApiClient };

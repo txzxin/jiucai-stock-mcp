@@ -1,18 +1,20 @@
 import { HttpClient } from '../utils/http-client.js';
 import {
-  ArticleRankingRequest,
   ArticleRankingResponse,
-  TimelineEventsRequest,
   TimelineEventsResponse,
   ArticleRankingItem,
   TimelineEvent,
-  ArticleRankingRequestSchema,
   ArticleRankingResponseSchema,
-  TimelineEventsRequestSchema,
   TimelineEventsResponseSchema
 } from './types.js';
 import { z } from 'zod';
 
+/**
+ * 韭研公社API客户端
+ * 
+ * 提供对韭研公社API的封装调用，包含文章排行榜和时间轴事件接口。
+ * 注意：基于实际API测试结果，不同接口支持的参数有所不同。
+ */
 export class JiuyangongsheApiClient {
   private httpClient: HttpClient;
 
@@ -29,30 +31,20 @@ export class JiuyangongsheApiClient {
 
   /**
    * 获取文章排行榜数据
-   * 基于实际API调用观察，使用POST请求到/v1/article/hot-list
+   * 基于实际API测试，rank-board接口不支持任何参数，返回固定的排行榜数据
    */
-  async getArticleRanking(params: ArticleRankingRequest): Promise<ArticleRankingResponse> {
+  async getArticleRanking(): Promise<ArticleRankingResponse> {
     try {
-      // 验证输入参数
-      const validatedParams = ArticleRankingRequestSchema.parse(params);
-      
-      // 构建请求参数，基于实际API格式
-      const requestData = {
-        timeRange: validatedParams.timeRange || 'day',
-        category: validatedParams.category || 'all', 
-        pageSize: Math.min(validatedParams.limit || 20, 100), // 限制最大值
-        page: 1
-      };
+      // rank-board接口不支持任何参数，直接调用
+      const response = await this.httpClient.post<any>('/v1/article/rank-board', {});
 
-      const response = await this.httpClient.post<any>('/v1/article/hot-list', requestData);
-
-      // 检查API响应格式
-      if (response.code !== 0 && response.errCode !== 0) {
+      // 检查API响应格式 - 注意实际API使用 errCode 字符串
+      if (response.errCode !== "0" && response.errCode !== 0) {
         throw new Error(`API错误: ${response.message || response.msg || '请求失败'}`);
       }
 
-      // 验证响应数据结构
-      const rawData = response.data?.list || response.data || [];
+      // 验证响应数据结构 - 实际API返回 hot_article_list
+      const rawData = response.data?.hot_article_list || response.data?.list || response.data || [];
       if (!Array.isArray(rawData)) {
         throw new Error('API返回的数据格式不正确，期望数组类型');
       }
@@ -82,29 +74,18 @@ export class JiuyangongsheApiClient {
 
   /**
    * 获取时间轴事件数据
-   * 基于实际API调用观察，使用POST请求到/v1/timeline/events
+   * 基于实际API测试，news接口仅支持limit参数来控制返回数量
    */
-  async getTimelineEvents(params: TimelineEventsRequest): Promise<TimelineEventsResponse> {
+  async getTimelineEvents(params: { limit?: number }): Promise<TimelineEventsResponse> {
     try {
-      // 验证输入参数
-      const validatedParams = TimelineEventsRequestSchema.parse(params);
-      
       const requestData: any = {
-        eventType: validatedParams.eventType || 'all',
-        pageSize: Math.min(validatedParams.limit || 20, 100), // 限制最大值
-        page: 1
+        limit: Math.min(params.limit || 20, 100) // 限制最大值
       };
-      
-      if (validatedParams.startDate) {
-        requestData.startDate = validatedParams.startDate;
-      }
-      if (validatedParams.endDate) {
-        requestData.endDate = validatedParams.endDate;
-      }
 
-      const response = await this.httpClient.post<any>('/v1/timeline/events', requestData);
+      const response = await this.httpClient.post<any>('/v1/timeline/news', requestData);
 
-      if (response.code !== 0 && response.errCode !== 0) {
+      // 检查API响应格式 - 注意实际API使用 errCode 字符串
+      if (response.errCode !== "0" && response.errCode !== 0) {
         throw new Error(`API错误: ${response.message || response.msg || '请求失败'}`);
       }
 
@@ -145,13 +126,13 @@ export class JiuyangongsheApiClient {
    */
   private transformArticleData(rawData: any[]): ArticleRankingItem[] {
     return rawData.map((item: any) => ({
-      id: item.id || item.articleId || item.aid || String(Math.random()),
+      id: item.article_id || item.id || item.articleId || item.aid || String(Math.random()),
       title: item.title || item.articleTitle || item.name || '',
       author: item.author || item.userName || item.nickname || item.user?.name || '',
-      authorId: item.authorId || item.userId || item.uid || item.user?.id || '',
+      authorId: item.user_id || item.authorId || item.userId || item.uid || item.user?.id || '',
       hotScore: Number(item.hotScore || item.heat || item.score || item.hot || 0),
       publishTime: this.formatApiDate(item.publishTime || item.createTime || item.publishedAt || item.time),
-      url: item.url || item.link || `/a/${item.id || item.articleId}`,
+      url: item.url || item.link || `/a/${item.article_id || item.id || item.articleId}`,
       category: this.formatCategory(item.category || item.categoryName || item.type),
       viewCount: Number(item.viewCount || item.readCount || item.views || 0),
       commentCount: Number(item.commentCount || item.replyCount || item.comments || 0),

@@ -57,28 +57,11 @@ npm start
 
 获取韭研公社文章热度排行榜数据，用于分析市场热点和投资者关注度。
 
-**参数：**
-- `timeRange` (可选): 时间范围
-  - `day` - 今日 (默认)
-  - `week` - 本周
-  - `month` - 本月
-- `category` (可选): 文章分类
-  - `all` - 全部 (默认)
-  - `stock` - 个股研究
-  - `industry` - 题材行业
-  - `news` - 资讯萃取
-  - `memo` - 纪要转载
-- `limit` (可选): 返回文章数量限制，默认 20 篇 (1-100)
-
 **使用示例：**
 ```json
 {
   "name": "get_article_ranking",
-  "arguments": {
-    "timeRange": "day",
-    "category": "stock",
-    "limit": 10
-  }
+  "arguments": {}
 }
 ```
 
@@ -86,26 +69,12 @@ npm start
 
 获取韭研公社财经事件时间轴数据，用于分析重要财经事件和投资机会。
 
-**参数：**
-- `startDate` (可选): 开始日期，格式：YYYY-MM-DD
-- `endDate` (可选): 结束日期，格式：YYYY-MM-DD
-- `eventType` (可选): 事件类型
-  - `all` - 全部 (默认)
-  - `earnings` - 财报
-  - `policy` - 政策
-  - `merger` - 并购
-  - `investment` - 投资
-- `limit` (可选): 返回事件数量限制，默认 20 个 (1-100)
-
 **使用示例：**
 ```json
 {
   "name": "get_timeline_events",
   "arguments": {
-    "startDate": "2024-01-01",
-    "endDate": "2024-01-31",
-    "eventType": "earnings",
-    "limit": 15
+    "limit": 10
   }
 }
 ```
@@ -153,14 +122,6 @@ jiucai-stock-mcp/
 2. 在 `src/services/types.ts` 中定义相关类型
 3. 使用 Zod 进行数据验证
 
-## 许可证
-
-MIT License
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request 来改进这个项目。
-
 ---
 
-本项目使用 Claude Code 生成。
+本项目使用 Claude Code 生成（使用 [SuperClaude](https://github.com/SuperClaude-Org/SuperClaude_Framework) 增强）。

@@ -1,7 +1,12 @@
 import { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { JiuyangongsheApiClient } from '../services/jiuyangongshe-api.js';
-import { ArticleRankingRequestSchema } from '../services/types.js';
 
+/**
+ * 文章热度排行榜工具
+ * 
+ * 获取韭研公社文章热度排行榜数据，用于分析市场热点和投资者关注度。
+ * 注意：rank-board 接口不支持任何参数，返回固定的排行榜数据。
+ */
 export class ArticleRankingTool {
   private apiClient: JiuyangongsheApiClient;
 
@@ -11,34 +16,15 @@ export class ArticleRankingTool {
 
   /**
    * 获取MCP工具定义
+   * 注意：此工具不接受任何参数
    */
   getToolDefinition(): Tool {
     return {
       name: 'get_article_ranking',
-      description: '获取韭研公社文章热度排行榜数据，用于分析市场热点和投资者关注度',
+      description: '获取韭研公社文章热度排行榜数据，用于分析市场热点和投资者关注度。注意：此接口不支持任何参数，返回固定的排行榜数据。',
       inputSchema: {
         type: 'object',
-        properties: {
-          timeRange: {
-            type: 'string',
-            enum: ['day', 'week', 'month'],
-            description: '时间范围：day=今日，week=本周，month=本月',
-            default: 'day'
-          },
-          category: {
-            type: 'string',
-            enum: ['all', 'stock', 'industry', 'news', 'memo'],
-            description: '文章分类：all=全部，stock=个股研究，industry=题材行业，news=资讯荟萃，memo=纪要转载',
-            default: 'all'
-          },
-          limit: {
-            type: 'number',
-            minimum: 1,
-            maximum: 100,
-            description: '返回文章数量限制，默认20篇',
-            default: 20
-          }
-        },
+        properties: {},
         additionalProperties: false
       }
     };
@@ -46,14 +32,12 @@ export class ArticleRankingTool {
 
   /**
    * 执行工具调用
+   * 注意：忽略所有传入的参数，直接调用API
    */
   async execute(args: unknown): Promise<any> {
     try {
-      // 验证参数
-      const validatedArgs = ArticleRankingRequestSchema.parse(args);
-      
-      // 调用API
-      const response = await this.apiClient.getArticleRanking(validatedArgs);
+      // 调用API（不传任何参数）
+      const response = await this.apiClient.getArticleRanking();
       
       if (!response.success) {
         throw new Error('获取文章排行榜数据失败');
@@ -66,14 +50,11 @@ export class ArticleRankingTool {
         data: {
           articles: response.data.articles,
           total: response.data.total,
-          queryParams: validatedArgs,
           timestamp: response.data.timestamp
         },
         metadata: {
-          timeRange: validatedArgs.timeRange,
-          category: validatedArgs.category,
           dataSource: '韭研公社',
-          apiEndpoint: '/v1/article/hot-list'
+          apiEndpoint: '/v1/article/rank-board'
         }
       };
     } catch (error) {
